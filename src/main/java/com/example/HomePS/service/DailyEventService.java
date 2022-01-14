@@ -81,9 +81,10 @@ public class DailyEventService {
             oldEvent.setTimeStart((event.getTimeStart()));
         if (event.getTimeEnd() != null)
             oldEvent.setTimeEnd((event.getTimeEnd()));
-        if (event.getRepeatAfterNumOfDays() != 0) {
-            oldEvent.setRepeatAfterNumOfDays(event.getRepeatAfterNumOfDays());
+        if(event.getDayHappen() != null){
+            oldEvent.setDayHappen(event.getDayHappen());
         }
         return save(oldEvent);
     }
+
 }

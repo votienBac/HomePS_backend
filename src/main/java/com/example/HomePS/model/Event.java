@@ -1,14 +1,12 @@
 package com.example.HomePS.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.time.Instant;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -26,6 +24,13 @@ public class Event {
     private Instant timeStart;
     private Instant timeEnd;
     private double percentDiscount;
+    @JsonIgnore
+    @Column(nullable=false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = false;
+    @JsonIgnore
+    public boolean isDeleted() {
+        return deleted;
+    }
     @Transient
     public boolean isHappenning(){
         if(Instant.now().isBefore(this.timeEnd) && Instant.now().isAfter(this.timeStart)){

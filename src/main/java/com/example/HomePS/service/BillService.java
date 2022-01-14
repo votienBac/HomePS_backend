@@ -139,9 +139,10 @@ public class BillService {
         bill.setTimeEnd(Instant.now());
         bill.setPaid(true);
         findEventForBill(bill);
+        findDailyEventForBill(bill);
         bill.setTotalPrice(getTotalBillPrice(bill));
         bill.setTotalHourPlayed(getTotalHourPlayed(bill));
-        addBill_OneDay(bill);
+        //addBill_OneDay(bill);
         return billRepository.save(bill);
     }
 
@@ -192,11 +193,21 @@ public class BillService {
 
     public Double getTotalBillPrice(Bill bill) {
         double sum = 0;
-        if (bill.getEvent() != null) {
+        if (bill.getEvent() != null && bill.getDailyEvent() != null) {
+            if (bill.getEvent().isDeleted() && bill.getDailyEvent().isDeleted()) {
+                sum = getTotalHourPlayed(bill) * PricePerHour;
+            } else if (bill.getDailyEvent().isDeleted()) {
+                sum = getTotalHourPlayed(bill) * PricePerHour * (100f - bill.getEvent().getPercentDiscount()) / 100f;
+            } else if (bill.getEvent().isDeleted()) {
+                sum = getTotalHourPlayed(bill) * PricePerHour * (100f - bill.getDailyEvent().getPercentDiscount()) / 100f;
+            } else {
+                double maxDiscount = Math.max(bill.getEvent().getPercentDiscount(), bill.getDailyEvent().getPercentDiscount());
+                sum = getTotalHourPlayed(bill) * PricePerHour * (100f - maxDiscount) / 100f;
+            }
+        } else if (bill.getEvent() != null && !bill.getEvent().isDeleted()) {
             sum = getTotalHourPlayed(bill) * PricePerHour * (100f - bill.getEvent().getPercentDiscount()) / 100f;
-        } else if (bill.getDailyEvent() != null) {
+        } else if (bill.getDailyEvent() != null && !bill.getDailyEvent().isDeleted()) {
             sum = getTotalHourPlayed(bill) * PricePerHour * (100f - bill.getDailyEvent().getPercentDiscount()) / 100f;
-
         } else {
             sum = getTotalHourPlayed(bill) * PricePerHour;
         }
@@ -207,13 +218,14 @@ public class BillService {
             }
         }
         return sum;
+
     }
 
     public void findEventForBill(Bill bill) {
         if (!eventRepository.findAll().isEmpty()) {
             List<Event> events = eventRepository.findAll();
             for (Event event : events) {
-                if (bill.getTimeStart().isAfter(event.getTimeStart()) && bill.getTimeEnd().isBefore(event.getTimeEnd())) {
+                if (bill.getTimeStart().isAfter(event.getTimeStart()) && bill.getTimeStart().isBefore(event.getTimeEnd())) {
                     bill.setEvent(event);
                 }
             }
@@ -224,13 +236,37 @@ public class BillService {
         if (!dailyEventRepository.findAll().isEmpty()) {
             List<DailyEvent> dailyEvents = dailyEventRepository.findAll();
             for (DailyEvent dailyEvent : dailyEvents) {
-                dailyEvent.setTimeAgain();
-                if (bill.getTimeStart().isAfter(dailyEvent.getTimeStart()) && bill.getTimeEnd().isBefore(dailyEvent.getTimeEnd())) {
+
+                if (check(dailyEvent.getDayHappen(), convertToString(bill)) &&
+                        LocalTime.ofInstant(bill.getTimeStart(),ZoneId.of("GMT+7")).isAfter(dailyEvent.getTimeStart()) &&
+                        LocalTime.ofInstant(bill.getTimeStart(),ZoneId.of("GMT+7")).isBefore(dailyEvent.getTimeEnd())) {
                     bill.setDailyEvent(dailyEvent);
                 }
-                dailyEventRepository.save(dailyEvent);
+
             }
         }
+    }
+    public boolean check(String timeStartOfBill, String dayHappen){
+        for(int i = 0; i<7; i++){
+            if(timeStartOfBill.charAt(i)=='1' && dayHappen.charAt(i) == '1'){
+                return true;
+            }
+        }
+        return false;
+    }
+    public String convertToString(Bill bill){
+        var day = bill.getTimeStart().atZone(ZoneId.of("Asia/Ho_Chi_Minh")).getDayOfWeek();
+        switch (day){
+            case MONDAY: return "1000000";
+            case TUESDAY: return "0100000";
+            case WEDNESDAY: return "0010000";
+            case THURSDAY: return "0001000";
+            case FRIDAY: return "0000100";
+            case SATURDAY:return "0000010";
+            case SUNDAY: return  "0000001";
+
+        }
+        return null;
     }
 
     public void deleteBill(Bill bill) {

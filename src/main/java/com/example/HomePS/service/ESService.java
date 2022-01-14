@@ -65,9 +65,9 @@ public class ESService {
     public ExtraService update(Long id, ExtraService service) {
         var oldService = getService(id);
         if (service.getServiceName() != null)
-            oldService.setServiceName((oldService.getServiceName()));
+            oldService.setServiceName((service.getServiceName()));
         if (service.getPrice() != 0.0)
-            oldService.setPrice((oldService.getPrice()));
+            oldService.setPrice((service.getPrice()));
         return save(oldService);
     }
 }
