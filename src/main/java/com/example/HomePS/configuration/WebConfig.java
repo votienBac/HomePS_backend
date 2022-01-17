@@ -3,7 +3,6 @@ package com.example.HomePS.configuration;
 
 import com.example.HomePS.auth.filter.CustomAuthenticationFilter;
 import com.example.HomePS.auth.filter.CustomAuthorizationFilter;
-import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -45,10 +41,8 @@ public class WebConfig extends WebSecurityConfigurerAdapter implements WebMvcCon
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin();
         http.cors();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -62,8 +56,9 @@ public class WebConfig extends WebSecurityConfigurerAdapter implements WebMvcCon
                         "/webjars/**")
                 .permitAll()
                 .anyRequest()
-                .permitAll(); // comment this to authenticate routes
-//                .authenticated(); // comment this to permit all routes
+//                .permitAll(); // comment this to authenticate routes
+                .authenticated(); // comment this to permit all routes
+
         http
                 .addFilter(new CustomAuthenticationFilter(authenticationManagerBean()))
                 .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

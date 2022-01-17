@@ -1,10 +1,7 @@
 package com.example.HomePS.service;
 
 import com.example.HomePS.model.DailyEvent;
-import com.example.HomePS.model.Event;
-import com.example.HomePS.model.ExtraService;
 import com.example.HomePS.repository.DailyEventRepository;
-import com.example.HomePS.repository.EventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +19,12 @@ public class DailyEventService {
     private final DailyEventRepository dailyEventRepository;
 
     public List<DailyEvent> getAllDailyEvents() {
-        return dailyEventRepository.findAll();
+        return dailyEventRepository.findAllDailyEvent();
     }
 
     public List<DailyEvent> getDailyEventsByPage(Integer pageNumber, Integer pageSize, String sortBy){
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<DailyEvent> result = dailyEventRepository.findAll(pageable);
+        Page<DailyEvent> result = dailyEventRepository.findAllDailyEvent(pageable);
         if (result.hasContent()) {
             return result.getContent();
         } else {
@@ -50,7 +47,7 @@ public class DailyEventService {
 
     public DailyEvent getDailyEvent(long id){
         return dailyEventRepository
-                .findById(id)
+                .findDailyEventById(id)
                 .orElseThrow(()->new IllegalStateException("Event not found!"));
     }
 
@@ -63,7 +60,11 @@ public class DailyEventService {
     }
 
     public void delete(long id){
-        dailyEventRepository.deleteById(id);
+        var toDelete = getDailyEvent(id);
+        toDelete.setDeleted(true);
+        save(toDelete);
+
+
     }
 
     public DailyEvent update(Long id, DailyEvent event) {
@@ -81,10 +82,9 @@ public class DailyEventService {
             oldEvent.setTimeStart((event.getTimeStart()));
         if (event.getTimeEnd() != null)
             oldEvent.setTimeEnd((event.getTimeEnd()));
-        if(event.getDayHappen() != null){
+        if (event.getDayHappen() != null) {
             oldEvent.setDayHappen(event.getDayHappen());
         }
         return save(oldEvent);
     }
-
 }

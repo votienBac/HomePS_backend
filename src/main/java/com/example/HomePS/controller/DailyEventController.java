@@ -21,14 +21,14 @@ public class DailyEventController {
     }
 
     @GetMapping
-    public DailyEventResponse getDailyEventsByPage(
+    public ResponseEntity<DailyEventResponse> getDailyEventsByPage(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(required = false, defaultValue = "dailyEventId") String sortBy
     ){
         int totalPage = (int) Math.ceil(dailyEventService.getAllDailyEvents().size() * 1.0 / size);
         List<DailyEvent> dailyEventList = dailyEventService.getDailyEventsByPage(page - 1, size, sortBy);
-        return new DailyEventResponse(page, totalPage, dailyEventList);
+        return ResponseEntity.ok(new DailyEventResponse(page, totalPage, dailyEventList));
     }
 
     @GetMapping("/search")
@@ -36,7 +36,7 @@ public class DailyEventController {
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
-            @RequestParam(required = false, defaultValue = "eventId") String sortBy
+            @RequestParam(required = false, defaultValue = "dailyEventId") String sortBy
     ) {
         if (query.equals("")) {
             int totalPage = (int) Math.ceil(dailyEventService.getAllDailyEvents().size() * 1.0 / size);

@@ -27,24 +27,4 @@ public class HomePsApplication {
 		return new BCryptPasswordEncoder();
 	}
 
-
-	/**
-	 * this function run right after application begin
-	 * check if user "admin" and role "ADMIN" existed in db
-	 * if not, create and set role of user "admin" as "ADMIN"
-	 */
-	@Bean
-	CommandLineRunner run(AppUserService userService) {
-		return args -> {
-			var user = userService.getUser("admin");
-			if (user == null)
-				userService.saveUser(new AppUser(null, "Admin", "admin", "123456", new ArrayList<>()));
-
-			var role = userService.getRole("ADMIN");
-			if (role == null) {
-				userService.saveRole(new Role(null, "ADMIN"));
-				userService.addRoleToUser("admin", "ADMIN");
-			}
-		};
 	}
-}

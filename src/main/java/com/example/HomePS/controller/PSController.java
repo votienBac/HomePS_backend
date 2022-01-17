@@ -23,7 +23,7 @@ public class PSController {
     }
 
     @GetMapping
-    public PsResponse getPSByPage(
+    public ResponseEntity<PsResponse> getPSByPage(
             @RequestParam(required = false, defaultValue = "full") String status,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -32,7 +32,7 @@ public class PSController {
         List<PlayStation> psList;
         int totalPage;
 
-        switch (status) {
+         switch (status) {
             case "free":
                 psList = psService.getPSByStatus(FREE, page - 1, size, sortBy);
                 totalPage = (int) Math.ceil(psService.getAllByStatus(FREE).size() * 1.0 / size);
@@ -50,7 +50,7 @@ public class PSController {
                 totalPage = (int) Math.ceil(psService.getAll().size() * 1.0 / size);
                 break;
         }
-        return new PsResponse(page, totalPage, psList);
+        return ResponseEntity.ok(new PsResponse(page, totalPage, psList));
     }
 
     @GetMapping("/{id}")

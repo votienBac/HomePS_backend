@@ -10,11 +10,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+
+import static com.example.HomePS.model.PlayStation.DELETED;
 
 @Service
 @Transactional
@@ -24,11 +26,11 @@ public class PSService {
     private final PSRepository psRepository;
 
     public List<PlayStation> getAll() {
-        return psRepository.findAll();
+        return psRepository.findAllPs();
     }
     public List<PlayStation> getPSByPage(Integer pageNumber, Integer pageSize, String sortBy){
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<PlayStation> result = psRepository.findAll(pageable);
+        Page<PlayStation> result = psRepository.findAllPs(pageable);
 
         if (result.hasContent()) {
             return result.getContent();
@@ -89,7 +91,9 @@ public class PSService {
     }
 
     public void delete(long id){
-        psRepository.deleteById(id);
+        var toDelete = psRepository.getById(id);
+        toDelete.setPsStatus(DELETED);
+        save(toDelete);
     }
 
 

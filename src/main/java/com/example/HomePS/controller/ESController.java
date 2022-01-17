@@ -22,14 +22,14 @@ public class ESController {
     }
 
     @GetMapping
-    public ServiceResponse getServicesByPage(
+    public ResponseEntity<ServiceResponse> getServicesByPage(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(required = false, defaultValue = "serviceId") String sortBy
     ){
         int totalPage = (int) Math.ceil(esService.getAllService().size() * 1.0 / size);
         List<ExtraService> serviceList = esService.getServicesByPage(page - 1, size, sortBy);
-        return new ServiceResponse(page, totalPage, serviceList);
+        return ResponseEntity.ok(new ServiceResponse(page, totalPage, serviceList));
     }
 
     @GetMapping("/{id}")
@@ -43,7 +43,7 @@ public class ESController {
     }
 
     @GetMapping("/search")
-    public ServiceResponse searchESByName(
+    public ResponseEntity<ServiceResponse> searchESByName(
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -52,11 +52,11 @@ public class ESController {
         if (query.equals("")) {
             int totalPage = (int) Math.ceil(esService.getAllService().size() * 1.0 / size);
             List<ExtraService> serviceList = esService.getServicesByPage(page - 1, size, sortBy);
-            return new ServiceResponse(page, totalPage, serviceList);
+            return ResponseEntity.ok(new ServiceResponse(page, totalPage, serviceList));
         }
         int totalPage = (int) Math.ceil(esService.getESByName(query).size() * 1.0 / size);
         List<ExtraService> serviceList = esService.getESByName(query, page - 1, size, sortBy);
-        return new ServiceResponse(page, totalPage, serviceList);
+        return ResponseEntity.ok(new ServiceResponse(page, totalPage, serviceList));
     }
 
     @PutMapping("/{id}")

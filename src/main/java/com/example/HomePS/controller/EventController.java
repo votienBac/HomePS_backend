@@ -21,14 +21,14 @@ public class EventController {
     }
 
     @GetMapping
-    public EventResponse getEventsByPage(
+    public ResponseEntity<EventResponse> getEventsByPage(
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @RequestParam(required = false, defaultValue = "eventId") String sortBy
     ){
         int totalPage = (int) Math.ceil(eventService.getAllEvents().size() * 1.0 / size);
         List<Event> eventList = eventService.getEventsByPage(page - 1, size, sortBy);
-        return new EventResponse(page, totalPage, eventList);
+        return ResponseEntity.ok(new EventResponse(page, totalPage, eventList));
     }
 
     @GetMapping("/{id}")
@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @GetMapping("/search")
-    public EventResponse searchEventByName(
+    public ResponseEntity<EventResponse> searchEventByName(
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -51,11 +51,11 @@ public class EventController {
         if (query.equals("")) {
             int totalPage = (int) Math.ceil(eventService.getAllEvents().size() * 1.0 / size);
             List<Event> eventList = eventService.getEventsByPage(page - 1, size, sortBy);
-            return new EventResponse(page, totalPage, eventList);
+            return ResponseEntity.ok(new EventResponse(page, totalPage, eventList));
         }
         int totalPage = (int) Math.ceil(eventService.searchEventByName(query).size() * 1.0 / size);
         List<Event> eventList = eventService.searchEventByName(query, page - 1, size, sortBy);
-        return new EventResponse(page, totalPage, eventList);
+        return ResponseEntity.ok(new EventResponse(page, totalPage, eventList));
     }
 
     @PutMapping("/{id}")

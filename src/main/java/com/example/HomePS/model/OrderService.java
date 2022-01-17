@@ -3,11 +3,9 @@ package com.example.HomePS.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
 @Data
@@ -19,11 +17,14 @@ public class OrderService {
     @Column(nullable = false)
     private Integer quantity;
 
+    private Double totalPrice;
+
     public OrderService(Bill bill, ExtraService extraService, Integer quantity) {
         pk = new OrderServicePK();
         pk.setBill(bill);
         pk.setExtraService(extraService);
         this.quantity = quantity;
+        totalPrice = extraService.getPrice() * quantity;
     }
 
     @Transient
@@ -33,6 +34,6 @@ public class OrderService {
 
     @Transient
     public Double getTotalPrice(){
-        return getService().getPrice()*getQuantity();
+        return totalPrice;
     }
 }

@@ -15,5 +15,4 @@ public class Daily_TurnOver {
     @Id
     private LocalDate date;
     private Double  turnOver;
-
 }

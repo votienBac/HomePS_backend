@@ -15,12 +15,13 @@ import java.util.stream.Collectors;
 public class OrderESService {
     private final OrderServiceRepository orderServiceRepository;
 
-    public OrderService create(OrderService orderService){
+    public OrderService create(OrderService orderService) {
         var existedOrderService = orderServiceRepository.findById(orderService.getPk());
         if(existedOrderService.isPresent()) {
-            var quantity = orderService.getQuantity()+existedOrderService.get().getQuantity();
+            var quantity = orderService.getQuantity() + existedOrderService.get().getQuantity();
             if (quantity <= 0) quantity = 0;
             orderService.setQuantity(quantity);
+            orderService.setTotalPrice(quantity * existedOrderService.get().getService().getPrice());
         }
         return orderServiceRepository.save(orderService);
     }
@@ -31,6 +32,5 @@ public class OrderESService {
 
     public List<OrderService> getAllOrderById(Long billId) {
         return orderServiceRepository.findAllByBillId(billId);
-
     }
 }

@@ -19,11 +19,11 @@ public class ESService {
     private final ServiceRepository serviceRepository;
 
     public List<ExtraService> getAllService() {
-        return serviceRepository.findAll();
+        return serviceRepository.findAllService();
     }
     public List<ExtraService> getServicesByPage(Integer pageNumber, Integer pageSize, String sortBy){
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<ExtraService> result = serviceRepository.findAll(pageable);
+        Page<ExtraService> result = serviceRepository.findAllService(pageable);
         if (result.hasContent()) {
             return result.getContent();
         } else {
@@ -47,7 +47,7 @@ public class ESService {
 
     public ExtraService getService(long id){
         return serviceRepository
-                .findById(id)
+                .findServiceById(id)
                 .orElseThrow(()->new IllegalStateException("Service not found!"));
 
 
@@ -57,7 +57,9 @@ public class ESService {
     }
 
     public void delete(long id){
-        serviceRepository.deleteById(id);
+        var toDelete = getService(id);
+        toDelete.setDeleted(true);
+        save(toDelete);
     }
 
 
@@ -71,4 +73,3 @@ public class ESService {
         return save(oldService);
     }
 }
-

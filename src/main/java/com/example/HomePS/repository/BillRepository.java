@@ -16,6 +16,7 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
     Page<Bill> findAllByTimeEndIsNull(Pageable pageable);
     List<Bill> findAllByTimeEndIsNotNull();
     Page<Bill> findAllByTimeEndIsNotNull(Pageable pageable);
+
     @Query("SELECT b FROM Bill b WHERE lower(b.playStation.psName) LIKE lower(concat('%', :query, '%'))")
     List<Bill> searchBill(@Param("query") String query);
 

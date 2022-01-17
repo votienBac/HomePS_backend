@@ -24,6 +24,12 @@ public class Event {
     private Instant timeStart;
     private Instant timeEnd;
     private double percentDiscount;
+    @Transient
+    @ApiModelProperty(hidden = true)
+    public boolean isHappenning(){
+        return Instant.now().isBefore(this.timeEnd) && Instant.now().isAfter(this.timeStart);
+    }
+
     @JsonIgnore
     @Column(nullable=false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleted = false;
@@ -31,12 +37,4 @@ public class Event {
     public boolean isDeleted() {
         return deleted;
     }
-    @Transient
-    public boolean isHappenning(){
-        if(Instant.now().isBefore(this.timeEnd) && Instant.now().isAfter(this.timeStart)){
-            return true;
-        }
-        return false;
-    }
-
 }

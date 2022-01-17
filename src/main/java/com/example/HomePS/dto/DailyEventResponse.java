@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DailyEventResponse {
-
     public int currentPage;
     public int totalPage;
     public List<DailyEvent> dailyEventList;

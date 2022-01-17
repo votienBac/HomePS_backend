@@ -1,8 +1,6 @@
 package com.example.HomePS.service;
 
 import com.example.HomePS.model.Event;
-import com.example.HomePS.model.ExtraService;
-import com.example.HomePS.model.PlayStation;
 import com.example.HomePS.repository.EventRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,12 +19,12 @@ public class EventService {
     private final EventRepository eventRepository;
 
     public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+        return eventRepository.findAllEvent();
     }
 
     public List<Event> getEventsByPage(Integer pageNumber, Integer pageSize, String sortBy){
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<Event> result = eventRepository.findAll(pageable);
+        Page<Event> result = eventRepository.findAllEvent(pageable);
         if (result.hasContent()) {
             return result.getContent();
         } else {
@@ -49,7 +47,7 @@ public class EventService {
 
     public Event getEvent(long id){
         return eventRepository
-                .findById(id)
+                .findEventById(id)
                 .orElseThrow(()->new IllegalStateException("Event not found!"));
     }
     public Event save(Event event){
@@ -61,7 +59,9 @@ public class EventService {
     }
 
     public void delete(long id){
-        eventRepository.deleteById(id);
+        var toDelete = getEvent(id);
+        toDelete.setDeleted(true);
+        save(toDelete);
     }
 
     public Event update(long id, Event event) {
